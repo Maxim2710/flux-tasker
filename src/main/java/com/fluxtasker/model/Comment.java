@@ -1,14 +1,15 @@
 package com.fluxtasker.model;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Setter
 @Getter
 @AllArgsConstructor
@@ -16,22 +17,15 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 public class Comment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "task_id")
-    private Task task;
+    @Column("task_id")
+    private Long taskId;
 
-    @Column(name = "text")
+    @Column("text")
     private String text;
 
-    @Column(name = "created_at")
+    @Column("created_at")
     private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void OnCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
 }

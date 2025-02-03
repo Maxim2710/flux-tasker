@@ -1,15 +1,16 @@
 package com.fluxtasker.model;
 
 import com.fluxtasker.model.enums.TaskStatus;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,33 +19,22 @@ import java.time.LocalDateTime;
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
-    @Column(name = "title")
+    @Column("title")
     private String title;
 
-    @Column(name = "description")
+    @Column("description")
     private String description;
 
-    @Column(name = "status")
+    @Column("status")
     private TaskStatus status;
 
-    @Column(name = "created_at")
+    @Column("created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column("updated_at")
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void OnCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void OnUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }
