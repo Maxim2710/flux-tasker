@@ -2,6 +2,7 @@ package com.fluxtasker.controller;
 
 import com.fluxtasker.dto.TaskCreateDTO;
 import com.fluxtasker.dto.TaskFilterDTO;
+import com.fluxtasker.dto.TaskUpdateDTO;
 import com.fluxtasker.model.Task;
 import com.fluxtasker.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,13 @@ public class TaskController {
     public Mono<ResponseEntity<Task>> getUserById(@PathVariable Long id) {
         return taskService.getTaskById(id)
                 .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping(path = "/update")
+    public Mono<ResponseEntity<String>> updateTask(@RequestBody TaskUpdateDTO updateDTO) {
+        return taskService.updateTask(updateDTO)
+                .map(updatedTask -> ResponseEntity.ok("Задача успешно изменена"))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }
