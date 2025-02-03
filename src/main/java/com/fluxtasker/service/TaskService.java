@@ -62,4 +62,12 @@ public class TaskService {
                     return taskRepository.save(existingTask);
                 });
     }
+
+    public Mono<Boolean> deleteTaskById(Long id) {
+        return taskRepository.findById(id)
+                .flatMap(existingTask ->
+                        taskRepository.delete(existingTask)
+                                .then(Mono.just(true))
+                .defaultIfEmpty(false));
+    }
 }
