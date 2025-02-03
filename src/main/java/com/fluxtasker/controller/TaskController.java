@@ -53,4 +53,16 @@ public class TaskController {
                 .map(updatedTask -> ResponseEntity.ok("Задача успешно изменена"))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
+
+    @DeleteMapping(path = "/delete/{id}")
+    public Mono<ResponseEntity<String>> deleteTask(@PathVariable Long id) {
+        return taskService.deleteTaskById(id)
+                .flatMap(deletedTask ->{
+                    if (deletedTask) {
+                        return Mono.just(ResponseEntity.ok("Задача успешно удалена"));
+                    } else {
+                        return Mono.just(ResponseEntity.notFound().build());
+                    }
+                });
+    }
 }
