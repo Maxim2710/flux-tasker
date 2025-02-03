@@ -7,7 +7,10 @@ import com.fluxtasker.model.enums.TaskStatus;
 import com.fluxtasker.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Service
 public class TaskService {
@@ -22,5 +25,17 @@ public class TaskService {
 
         return taskRepository.save(task)
                 .onErrorMap(error -> new TaskCreationException("Ошибка при создании задачи"));
+    }
+
+    public Flux<Task> getTasks(List<Task> statuses, int page, int size) {
+        Flux<Task> taskFlux;
+        if (statuses == null || statuses.isEmpty()) {
+            taskFlux = taskRepository.findAll();
+        } else {
+            taskFlux = taskRepository.findAll()
+                    .filter(task -> statuses.contains(task.getStatus()));
+        }
+
+        return taskFlux.skip((long) page * size).take(size);
     }
 }
