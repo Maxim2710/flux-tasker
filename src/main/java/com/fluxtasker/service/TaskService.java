@@ -1,6 +1,7 @@
 package com.fluxtasker.service;
 
 import com.fluxtasker.dto.TaskCreateDTO;
+import com.fluxtasker.dto.TaskUpdateDTO;
 import com.fluxtasker.exception.TaskCreationException;
 import com.fluxtasker.model.Task;
 import com.fluxtasker.model.enums.TaskStatus;
@@ -41,5 +42,24 @@ public class TaskService {
 
     public Mono<Task> getTaskById(Long id) {
         return taskRepository.findById(id);
+    }
+
+    public Mono<Task> updateTask(TaskUpdateDTO updateDTO) {
+        return taskRepository.findById(updateDTO.getId())
+                .flatMap(existingTask -> {
+                    if (updateDTO.getTitle() != null) {
+                        existingTask.setTitle(updateDTO.getTitle());
+                    }
+
+                    if (updateDTO.getDescription() != null) {
+                        existingTask.setDescription(updateDTO.getDescription());
+                    }
+
+                    if (updateDTO.getStatus() != null) {
+                        existingTask.setStatus(updateDTO.getStatus());
+                    }
+
+                    return taskRepository.save(existingTask);
+                });
     }
 }
