@@ -27,7 +27,7 @@ public class TaskService {
                 .onErrorMap(error -> new TaskCreationException("Ошибка при создании задачи"));
     }
 
-    public Flux<Task> getTasks(List<Task> statuses, int page, int size) {
+    public Flux<Task> getTasks(List<TaskStatus> statuses, int page, int size) {
         Flux<Task> taskFlux;
         if (statuses == null || statuses.isEmpty()) {
             taskFlux = taskRepository.findAll();

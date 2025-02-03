@@ -1,15 +1,14 @@
 package com.fluxtasker.controller;
 
 import com.fluxtasker.dto.TaskCreateDTO;
+import com.fluxtasker.dto.TaskFilterDTO;
 import com.fluxtasker.model.Task;
 import com.fluxtasker.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -23,5 +22,20 @@ public class TaskController {
     public Mono<ResponseEntity<Task>> createTask(@RequestBody TaskCreateDTO taskDTO) {
         return taskService.createTask(taskDTO)
                 .map(task -> ResponseEntity.status(HttpStatus.CREATED).body(task));
+    }
+
+    @GetMapping
+    public Mono<ResponseEntity<Flux<Task>>> getTasks(@RequestBody Mono<TaskFilterDTO> filterDTOMono) {
+        return filterDTOMono.flatMap(filterDTO ->
+                Mono.just(
+                        ResponseEntity.status(HttpStatus.OK)
+                                .body(taskService.getTasks(
+                                        filterDTO.getStatuses(),
+                                        filterDTO.getPage(),
+                                        filterDTO.getSize()
+
+                                ))
+                )
+        );
     }
 }
