@@ -38,4 +38,8 @@ public class TaskService {
 
         return taskFlux.skip((long) page * size).take(size);
     }
+
+    public Mono<Task> getTaskById(Long id) {
+        return taskRepository.findById(id);
+    }
 }
