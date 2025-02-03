@@ -1,8 +1,6 @@
 package com.fluxtasker.controller;
 
-import com.fluxtasker.bom.response.ApiResponse;
 import com.fluxtasker.dto.TaskCreateDTO;
-import com.fluxtasker.exception.TaskCreationException;
 import com.fluxtasker.model.Task;
 import com.fluxtasker.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +20,8 @@ public class TaskController {
     private TaskService taskService;
 
     @PostMapping
-    public Mono<ResponseEntity<ApiResponse<Task>>> createTask(@RequestBody TaskCreateDTO taskDTO) {
+    public Mono<ResponseEntity<Task>> createTask(@RequestBody TaskCreateDTO taskDTO) {
         return taskService.createTask(taskDTO)
-                .map(task -> ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(task)))
-                .onErrorResume(TaskCreationException.class, ex ->
-                        Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(new ApiResponse<>(ex.getMessage())))
-                );
+                .map(task -> ResponseEntity.status(HttpStatus.CREATED).body(task));
     }
 }
