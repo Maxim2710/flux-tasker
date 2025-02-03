@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping(path = "/api/tasks")
 public class TaskController {
 
     @Autowired
@@ -37,5 +37,12 @@ public class TaskController {
                                 ))
                 )
         );
+    }
+
+    @GetMapping(path = "/{id}")
+    public Mono<ResponseEntity<Task>> getUserById(@PathVariable Long id) {
+        return taskService.getTaskById(id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }
