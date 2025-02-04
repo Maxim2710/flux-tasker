@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 import java.util.List;
 
@@ -18,6 +19,8 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
+    private final Sinks.Many<Task> taskSink = Sinks.many().multicast().onBackpressureBuffer();
+
     public Mono<Task> createTask(TaskCreateDTO taskDTO) {
         Task task = new Task();
         task.setTitle(taskDTO.getTitle());
@@ -25,6 +28,7 @@ public class TaskService {
         task.setStatus(TaskStatus.NEW);
 
         return taskRepository.save(task)
+                .doOnSuccess(taskSink::tryEmitNext)
                 .onErrorMap(error -> new TaskCreationException("Ошибка при создании задачи"));
     }
 
@@ -60,7 +64,8 @@ public class TaskService {
                     }
 
                     return taskRepository.save(existingTask);
-                });
+                })
+                .doOnSuccess(taskSink::tryEmitNext);
     }
 
     public Mono<Boolean> deleteTaskById(Long id) {
@@ -69,5 +74,9 @@ public class TaskService {
                         taskRepository.delete(existingTask)
                                 .then(Mono.just(true))
                 .defaultIfEmpty(false));
+    }
+
+    public Flux<Task> streamTasks() {
+        return taskSink.asFlux();
     }
 }
