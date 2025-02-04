@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -21,5 +22,18 @@ public class CommentController {
                 createDTO.getTaskId(),
                 createDTO.getText())
                 .map(comment -> ResponseEntity.status(HttpStatus.CREATED).body(comment));
+    }
+
+    @GetMapping(path = "/{taskId}")
+    public Mono<ResponseEntity<Flux<Comment>>> getCommentsByTaskId(@PathVariable Long taskId) {
+        Flux<Comment> commentsFlux = commentService.getCommentsByTaskId(taskId);
+        return commentsFlux.hasElements()
+                .flatMap(hasComment -> {
+                    if (hasComment) {
+                        return Mono.just(ResponseEntity.ok(commentsFlux));
+                    } else {
+                        return Mono.just(ResponseEntity.notFound().build());
+                    }
+                });
     }
 }
